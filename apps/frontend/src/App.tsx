@@ -1,82 +1,72 @@
+import { useState } from "react";
 import "./App.css";
+import { Header } from "./Components/Header/Header";
+import { Footer } from "./Components/Footer/Footer";
 
 function App() {
-  let count = 0;
-  const handleClick = async () => {
-    fetch("http://localhost:3000")
-      .then((response: Response) => response.json())
-      .then((data) => {
-        console.log(data);
-
-        count++;
-        const mainHeading = document.getElementById("main-heading");
-        if (mainHeading) {
-          const newParagraph = document.createElement("p");
-          newParagraph.textContent = JSON.stringify(data) + ` ${count}`; // Convert object to string
-          mainHeading.appendChild(newParagraph);
-        }
-      })
-      .catch((error: Error) => {
-        console.log(error);
-      });
+  const initialValue = {
+    email: "",
+    password: "",
   };
- 
-  // const handleClick = async (e: any) => {
-  //   try {
-  //     const response = await fetch("http://localhost:3000", {
-  //       method: "GET",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //     });
 
-  //     // Await the JSON parsing
-  //     const data = await response.json();
+  const [user, setUser] = useState(initialValue);
 
-  //     // Log the response data
-  //     console.log(data);
+  const handleChange = (e: any) => {
+    const { name, value } = e.target;
+    setUser({ ...user, [name]: value });
+  };
 
-  //     // Example: Dynamically update the DOM
-  //     const mainHeading = document.getElementById("main-heading");
-  //     if (mainHeading) {
-  //       const newParagraph = document.createElement("p");
-  //       newParagraph.textContent = JSON.stringify(data); // Convert object to string
-  //       mainHeading.appendChild(newParagraph);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error);
-  //   }
-  // };
+  const handleClick = async () => {
+    console.log(`The data we are sending is ${JSON.stringify(user)}`);
+    const response = await fetch("http://localhost:3000/api/submitUserData", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify(user),
+    });
 
-  // const handleClick = (e: any) => {
-  //   fetch("http://localhost:3000", {
-  //     method: "GET",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //   })
-  //     .then((response) => response.json()) // Parse JSON
-  //     .then((data) => {
-  //       console.log(data);
+    const data = await response.json();
 
-  //       // Example: Dynamically update the DOM
-  //       const mainHeading = document.getElementById("main-heading");
-  //       if (mainHeading) {
-  //         const newParagraph = document.createElement("p");
-  //         newParagraph.textContent = JSON.stringify(data); // Convert object to string
-  //         mainHeading.appendChild(newParagraph);
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error fetching data:", error);
-  //     });
-  // };
+    // const mainDiv = document.getElementById("main-div");
 
-  
+    // mainDiv?.appendChild(`<h1>This is my Response User: ${data.user}, Password: ${data.password}</>`);
+
+    console.log(`The received object is `, data.user);
+    console.log(`The received object is ${JSON.stringify(data.user)}`);
+    // console.log(`The data received is: User: ${data.email}, Password: ${data.password}`);
+  };
+
   return (
-    <h1 id="main-heading">
-      <button onClick={handleClick}>Click Me</button>
-    </h1>
+    <>
+      <Header />
+      <div id="main-div">
+        <label htmlFor="">
+          Email Address
+          <input
+            type="text"
+            placeholder="Enter Your Email"
+            name="email"
+            value={user.email}
+            onChange={handleChange}
+          />
+        </label>
+
+        <label htmlFor="">
+          Password
+          <input
+            type="password"
+            placeholder="Enter Your Password"
+            name="password"
+            value={user.password}
+            onChange={handleChange}
+          />
+        </label>
+
+        <button onClick={handleClick}>Submit</button>
+      </div>
+      <Footer />
+    </>
   );
 }
 

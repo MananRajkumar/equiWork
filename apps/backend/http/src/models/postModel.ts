@@ -6,9 +6,9 @@ interface postInterface extends Document{
     skillsRequired?: [string],
     applications?: [ObjectId],
     selectedUser?: {
-        jobId: ObjectId,
         userId: ObjectId
-    }
+    },
+    status: string
 }
 
 const postSchema: Schema<postInterface> = new Schema({
@@ -29,17 +29,17 @@ const postSchema: Schema<postInterface> = new Schema({
     },
     selectedUser: {
         type: {
-            jobId: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "Job",
-                required: true
-            },
             userId: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "UserAuth",
                 required: true
             }
         }
+    },
+    status: {
+        type: String,
+        enum: ["open", "closed"],
+        default: "open"
     }
 }, { timestamps: true });
 

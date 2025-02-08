@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
-import { UserAuth } from "../models/userModel";
+import { UserAuth } from "../models/userAuthModel";
 import { compare, genSalt, hash } from "bcrypt";
+import jwt from "jsonwebtoken";
 
 export const login = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -23,10 +24,14 @@ export const login = async (req: Request, res: Response): Promise<void> => {
             })
             return;
         }
+
+        const data = { _id: userExists._id, role: userExists.role };
+        const token = jwt.sign(data, process.env.JWT_SECRET as string, { expiresIn: "1d" });
+
         
         res.json({
             message: "Login Successful!!!",
-            user: userExists
+            token
         });
     } catch (error) {
         res.json({
@@ -38,7 +43,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { email, password } = req.body;
+        const { email, password, role } = req.body;
 
         const userExists = await UserAuth.findOne({ email });
 
@@ -54,16 +59,24 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
 
         const user = new UserAuth({
             email: email,
-            password: hashedPassword
+            password: hashedPassword,
+            role: role
         });
 
         await user.save();
 
+        const data = { _id: user._id, role: role };
+        const token = jwt.sign(data, process.env.JWT_SECRET as string, { expiresIn: "1d" });
+
+        
+
         res.json({
             message: "User created successfully with the given credentials!!!",
-            user: user
+            user: user,
+            token
         });
     } catch (error) {
+        console.log(error);
         res.json({
             message: "An error occured!!!",
             error: error,
