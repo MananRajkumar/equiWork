@@ -1,12 +1,13 @@
 import { Request, Response } from "express";
-import { UserProfile } from "../models/userAuthModel";
-import { CustomRequest } from "../utils/middlewares";
+import { UserProfile } from "../models/userProfileModel";
+
+
 
 export const getUser = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { userId } = req.query;
+        const { id } = req.user;
 
-        const user = await UserProfile.findOne({ userId: userId });
+        const user = await UserProfile.findOne({ userId: id });
 
         if(!user){
             res.status(404).json({
@@ -29,7 +30,19 @@ export const getUser = async (req: Request, res: Response): Promise<void> => {
 
 export const editUser = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { userId } = (req as CustomRequest).user;
+        if (!req.user) {
+            res.status(401).json({ message: "Unauthorized: No user found" });
+            return;
+        }
+        
+        const { id } = req.user;
+
+        const editedUser = await UserProfile.findOneAndUpdate({ userId: id }, req.body, { new: true });
+
+        res.json({
+            message: "Edited user successfully!",
+            user: editedUser
+        });
 
     } catch (error) {
         res.json({

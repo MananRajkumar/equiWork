@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { ZodSchema } from "zod";
-import { AuthRequest, Role } from "../schemas/utilSchema";
+import { Role } from "../schemas/utilSchema";
 
 const JWT_SECRET: string = process.env.JWT_SECRET || "myjwtsecret";
 
@@ -18,9 +18,10 @@ export const inputValidator = (schema: ZodSchema) => {
   };
 };
 
-export const verifyAuth = (req: AuthRequest, res: Response, next: NextFunction) => {
+export const verifyAuth = (req: Request, res: Response, next: NextFunction) => {
     try {
-        const token = req.headers.get("Authorization")?.split(" ")[1];
+        const token = req.headers['authorization']?.split(" ")[1];
+
 
         if(!token) {
             return res.status(401).json({
@@ -42,7 +43,7 @@ export const verifyAuth = (req: AuthRequest, res: Response, next: NextFunction) 
 };
 
 export const validateRole = (...authorizeRoles: Array<Role>) => {
-  return (req: AuthRequest, res: Response, next: NextFunction) => {
+  return (req: Request, res: Response, next: NextFunction) => {
     if (!authorizeRoles.includes(req.user.role)) {
       res.json({
         message: "Access Denied! You don't have permission.",

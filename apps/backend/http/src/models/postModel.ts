@@ -1,14 +1,15 @@
 import mongoose, { model, Schema, Document, Model, ObjectId } from "mongoose";
+import { PostStatus } from "../schemas/utilSchema";
 
 interface postInterface extends Document{
     title: string,
     description: string,
-    skillsRequired?: [string],
-    applications?: [ObjectId],
+    createdBy: ObjectId,
+    skillsRequired: string[],
     selectedUser?: {
         userId: ObjectId
     },
-    status: string
+    status: PostStatus
 }
 
 const postSchema: Schema<postInterface> = new Schema({
@@ -20,12 +21,13 @@ const postSchema: Schema<postInterface> = new Schema({
         type: String,
         required: true
     },
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "CompanyProfile",
+        required: true
+    },
     skillsRequired: {
         type: [String]
-    },
-    applications: {
-        type: [mongoose.Schema.Types.ObjectId],
-        ref: "Application"
     },
     selectedUser: {
         type: {
@@ -38,8 +40,8 @@ const postSchema: Schema<postInterface> = new Schema({
     },
     status: {
         type: String,
-        enum: ["open", "closed"],
-        default: "open"
+        enum: Object.values(PostStatus),
+        default: PostStatus.Open
     }
 }, { timestamps: true });
 
