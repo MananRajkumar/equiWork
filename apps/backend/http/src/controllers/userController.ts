@@ -21,23 +21,28 @@ export const getUser = async (req: Request, res: Response): Promise<void> => {
             user: user
         });
     } catch (error) {
-        res.json({
-            message: "An Error occured",
-            error: error
+        res.status(500).json({
+            message: "An Error occurred",
+            error: error instanceof Error ? error.message : error,
         });
     }
 };
 
 export const editUser = async (req: Request, res: Response): Promise<void> => {
     try {
-        if (!req.user) {
-            res.status(401).json({ message: "Unauthorized: No user found" });
-            return;
-        }
         
         const { id } = req.user;
 
-        const editedUser = await UserProfile.findOneAndUpdate({ userId: id }, req.body, { new: true });
+        const updateData = { ... req.body };
+
+        if (("selectedJobs" in updateData || "userId" in updateData || "applications" in updateData) && req.user.role !== "admin") {
+            res.json({
+                message: "You are not allowed to modify selectedJobs or userId or applications"
+            });
+            return;
+        }
+
+        const editedUser = await UserProfile.findOneAndUpdate({ userId: id }, updateData, { new: true });
 
         res.json({
             message: "Edited user successfully!",
@@ -45,9 +50,9 @@ export const editUser = async (req: Request, res: Response): Promise<void> => {
         });
 
     } catch (error) {
-        res.json({
-            message: "An Error occured",
-            error: error
+        res.status(500).json({
+            message: "An Error occurred",
+            error: error instanceof Error ? error.message : error,
         });
     }
 };

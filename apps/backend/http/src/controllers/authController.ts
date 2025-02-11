@@ -35,16 +35,16 @@ export const login = async (req: Request, res: Response): Promise<void> => {
             token
         });
     } catch (error) {
-        res.json({
-            message: "An Error occured",
-            error: error
+        res.status(500).json({
+            message: "An Error occurred",
+            error: error instanceof Error ? error.message : error,
         });
     }
 };
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { email, password, role } = req.body;
+        const { email, fullName, password, role } = req.body;
 
         const userExists = await UserAuth.findOne({ email });
 
@@ -58,28 +58,33 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
         const salt = await genSalt(13);
         const hashedPassword = await hash(password, salt);
 
-        const user = new UserAuth({
+
+        const userAuth = await UserAuth.create({
             email: email,
             password: hashedPassword,
             role: role
         });
 
-        await user.save();
+        const userProfile = await UserProfile.create({
+            userId: userAuth._id,
+            fullName: fullName
+        });
 
-        const data = { _id: user._id, role: role };
+        const data = { id: userAuth._id, role: role };
         const token = jwt.sign(data, process.env.JWT_SECRET as string, { expiresIn: "1d" });
 
         
 
         res.json({
             message: "User created successfully with the given credentials!!!",
-            user: user,
+            userAuth: userAuth,
+            userProfile: userProfile,
             token
         });
     } catch (error) {
-        res.json({
-            message: "An error occured!!!",
-            error: error,
+        res.status(500).json({
+            message: "An Error occurred",
+            error: error instanceof Error ? error.message : error,
         });
     }
 };
@@ -94,9 +99,9 @@ export const getAllUsers = async (req: Request, res: Response): Promise<void> =>
             users: users
         });
     } catch (error) {
-        res.json({
-            message: "An error occured!!!",
-            error: error,
+        res.status(500).json({
+            message: "An Error occurred",
+            error: error instanceof Error ? error.message : error,
         });
     }
 };
@@ -110,16 +115,15 @@ export const deleteAllUsers = async (req: Request, res: Response): Promise<void>
             users: users
         });
     } catch (error) {
-        res.json({
-            message: "An error occured!!!",
-            error: error,
+        res.status(500).json({
+            message: "An Error occurred",
+            error: error instanceof Error ? error.message : error,
         });
     }
 };
 
 export const deleteUser = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { id } = req.user;
         const { email, password } = req.body;
 
         const user = await UserAuth.findOne( { email });

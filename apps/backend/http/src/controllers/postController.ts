@@ -14,16 +14,16 @@ export const getAllUserPosts = async (req: Request, res: Response): Promise<void
         });
 
     } catch (error) {
-        res.json({
-            message: "An Error occured",
-            error: error
+        res.status(500).json({
+            message: "An Error occurred",
+            error: error instanceof Error ? error.message : error,
         });
     }
 };
 
 export const getPost = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { postID } = req.params;
+        const { postID } = req.query;
         const post = await Post.findById(postID);
         res.json({
             message: "Fetched post successfully!",
@@ -31,9 +31,9 @@ export const getPost = async (req: Request, res: Response): Promise<void> => {
         });
 
     } catch (error) {
-        res.json({
-            message: "An Error occured",
-            error: error
+        res.status(500).json({
+            message: "An Error occurred",
+            error: error instanceof Error ? error.message : error,
         });
     }
 };
@@ -57,16 +57,16 @@ export const makePost = async (req: Request, res: Response): Promise<void> => {
         });
 
     } catch (error) {
-        res.json({
-            message: "An Error occured",
-            error: error
+        res.status(500).json({
+            message: "An Error occurred",
+            error: error instanceof Error ? error.message : error,
         });
     }
 };
 
 export const editPost = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { id } = req.params;
+        const { id } = req.query;
         const editedPost = await Post.findByIdAndUpdate({ id }, req.body, { new: true });  
 
         res.json({
@@ -75,16 +75,16 @@ export const editPost = async (req: Request, res: Response): Promise<void> => {
         });
 
     } catch (error) {
-        res.json({
-            message: "An Error occured",
-            error: error
+        res.status(500).json({
+            message: "An Error occurred",
+            error: error instanceof Error ? error.message : error,
         });
     }
 };
 
 export const deletePost = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { postID } = req.params;
+        const { postID } = req.query;
         const deletedPost = await Post.findByIdAndDelete(postID);  
         
         res.json({
@@ -93,9 +93,9 @@ export const deletePost = async (req: Request, res: Response): Promise<void> => 
         });
 
     } catch (error) {
-        res.json({
-            message: "An Error occured",
-            error: error
+        res.status(500).json({
+            message: "An Error occurred",
+            error: error instanceof Error ? error.message : error,
         });
     }
 };

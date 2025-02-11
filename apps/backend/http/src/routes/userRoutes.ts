@@ -7,8 +7,5 @@ router.get('/', getUser);
 
 router.patch('/edit-user', editUser);
 
-// router.get('/get-all-posts', getAllPostsOfUser);
-
-
 
 export default router;

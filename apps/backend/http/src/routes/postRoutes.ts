@@ -5,12 +5,12 @@ const router = Router();
 
 router.get('/get-all-user-posts', getAllUserPosts);
 
-router.get('/get-post/:postID', getPost);
+router.get('/get-post', getPost);
 
 router.post('/make-post', makePost);
 
-router.patch('/edit-post/:postID', editPost);
+router.patch('/edit-post', editPost);
 
-router.delete('/delete-post/:postID', deletePost);
+router.delete('/delete-post', deletePost);
 
 export default router;

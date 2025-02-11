@@ -2,16 +2,13 @@ import { Request, Response } from "express";
 import { Application } from "../models/applicationModel";
 import { ApplicationStatus, PostStatus } from "../schemas/utilSchema";
 import { Post } from "../models/postModel";
+import { UserProfile } from "../models/userProfileModel";
+import { Schema } from "mongoose";
 
 
 export const applyPost = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { postID } = req.params;
-
-        if (!req.user) {
-            res.status(401).json({ message: "Unauthorized" });
-            return;
-        }
+        const { postID } = req.query;
         const { id } = req.user;
         const { description } = req.body;
 
@@ -22,9 +19,13 @@ export const applyPost = async (req: Request, res: Response): Promise<void> => {
             status: ApplicationStatus.Pending
         });
 
+        const user = await UserProfile.findById(id);
+
+        user?.applications.push(application._id as Schema.Types.ObjectId);
+
         res.json({
             message: "Applied to post successfully!!!",
-            application,
+            application
         });
 
     } catch (error) {
@@ -37,7 +38,7 @@ export const applyPost = async (req: Request, res: Response): Promise<void> => {
 
 export const getApplication = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { applicationId } = req.params;
+        const { applicationId } = req.query;
 
         const application = await Application.findById(applicationId);
 
