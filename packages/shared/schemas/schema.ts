@@ -47,3 +47,8 @@ export const updateApplicationStatusSchema = z.object({
 export const sendMessageSchema = z.object({
     content: z.string()
 });
+
+
+
+
+export type ApplyPost = z.infer<typeof applyPostSchema>;

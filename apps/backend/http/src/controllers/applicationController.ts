@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { Application } from "../models/applicationModel";
-import { ApplicationStatus, PostStatus } from "../schemas/utilSchema";
+import { ApplicationStatus, PostStatus } from "../utils/utilSchema";
 import { Post } from "../models/postModel";
 import { UserProfile } from "../models/userProfileModel";
 import { Schema } from "mongoose";
